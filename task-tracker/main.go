@@ -28,6 +28,34 @@ type Task struct {
 	Updated_At  time.Time `json:"updated_at"`
 }
 
+func addHandler(w http.ResponseWriter, r *http.Request) {
+	var req CreateTaskRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid json")
+		return
+	}
+	if req.Description == "" {
+		writeError(w, http.StatusBadRequest, "write something in description")
+		return
+	}
+
+	idCounter++
+
+	newTask := Task{
+		ID:          idCounter,
+		Description: req.Description,
+		Status:      "in progress",
+		Created_At:  time.Now(),
+		Updated_At:  time.Now(),
+	}
+
+	writeJSON(w, http.StatusOK, APIResponse{
+		Success: true,
+		Data:    newTask,
+	})
+}
+
 type CreateTaskRequest struct {
 	Description string `json:"description"`
 }
@@ -48,33 +76,5 @@ func writeError(w http.ResponseWriter, status int, message string) {
 	writeJSON(w, status, APIResponse{
 		Success: false,
 		Error:   message,
-	})
-}
-
-func addHandler(w http.ResponseWriter, r *http.Request) {
-	var req CreateTaskRequest
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		writeError(w, http.StatusBadRequest, "invalid json")
-		return
-	}
-	if req.Description == "" {
-		writeError(w, http.StatusBadRequest, "write something in description")
-		return
-	}
-
-	idCounter++
-
-	newTask := Task{
-		ID:          idCounter,
-		Description: req.Description,
-		Status:      "not done",
-		Created_At:  time.Now(),
-		Updated_At:  time.Now(),
-	}
-
-	writeJSON(w, http.StatusOK, APIResponse{
-		Success: true,
-		Data:    newTask,
 	})
 }
