@@ -8,6 +8,7 @@ import (
 )
 
 var idCounter int
+var tasks []Task
 
 func main() {
 
@@ -50,14 +51,37 @@ func addHandler(w http.ResponseWriter, r *http.Request) {
 		Updated_At:  time.Now(),
 	}
 
+	tasks = append(tasks, newTask)
 	writeJSON(w, http.StatusOK, APIResponse{
 		Success: true,
 		Data:    newTask,
 	})
 }
 
+func updateHandler(w http.ResponseWriter, r *http.Request) {
+	var req UpdateTaskRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid json")
+		return
+	}
+
+	if req.Description != nil || req.Status != nil {
+		writeError(w, http.StatusBadRequest, "write something in description")
+		return
+	}
+
+}
+
 type CreateTaskRequest struct {
 	Description string `json:"description"`
+}
+
+type UpdateTaskRequest struct {
+	Description *string    `json:"description"`
+	Status      *string    `json:"status"`
+	Created_At  *time.Time `json:"created_at"`
+	Updated_At  time.Time  `json:"updated_at"`
 }
 
 type APIResponse struct {
