@@ -2,12 +2,22 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 )
 
+var idCounter int
+
 func main() {
 
+	http.HandleFunc("/tasks", addHandler) // post
+
+	port := ":8080"
+	log.Printf("Starting Server localhost %s\n", port)
+	if err := http.ListenAndServe(port, nil); err != nil {
+		log.Fatal(err)
+	}
 }
 
 type Task struct {
@@ -16,6 +26,10 @@ type Task struct {
 	Status      string    `json:"status"`
 	Created_At  time.Time `json:"created_at"`
 	Updated_At  time.Time `json:"updated_at"`
+}
+
+type CreateTaskRequest struct {
+	Description string `json:"description"`
 }
 
 type APIResponse struct {
@@ -34,5 +48,33 @@ func writeError(w http.ResponseWriter, status int, message string) {
 	writeJSON(w, status, APIResponse{
 		Success: false,
 		Error:   message,
+	})
+}
+
+func addHandler(w http.ResponseWriter, r *http.Request) {
+	var req CreateTaskRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid json")
+		return
+	}
+	if req.Description == "" {
+		writeError(w, http.StatusBadRequest, "write something in description")
+		return
+	}
+
+	idCounter++
+
+	newTask := Task{
+		ID:          idCounter,
+		Description: req.Description,
+		Status:      "not done",
+		Created_At:  time.Now(),
+		Updated_At:  time.Now(),
+	}
+
+	writeJSON(w, http.StatusOK, APIResponse{
+		Success: true,
+		Data:    newTask,
 	})
 }
