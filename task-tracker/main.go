@@ -48,7 +48,7 @@ func addHandler(w http.ResponseWriter, r *http.Request) {
 	newTask := Task{
 		ID:          idCounter,
 		Description: req.Description,
-		Status:      "in progress",
+		Status:      "to do",
 		Created_At:  time.Now(),
 		Updated_At:  time.Now(),
 	}
