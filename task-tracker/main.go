@@ -13,8 +13,9 @@ var tasks []Task
 
 func main() {
 
-	http.HandleFunc("/tasks", addHandler)         // post
+	http.HandleFunc("/tasks/add", addHandler)     // post
 	http.HandleFunc("/tasks/{id}", updateHandler) // put
+	http.HandleFunc("/tasks", listHandler)        // get
 
 	port := ":8080"
 	log.Printf("Starting Server localhost %s\n", port)
@@ -31,7 +32,22 @@ type Task struct {
 	Updated_At  time.Time `json:"updated_at"`
 }
 
+func listHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusBadRequest, "use get method")
+		return
+	}
+	writeJSON(w, http.StatusOK, APIResponse{
+		Success: true,
+		Data:    tasks,
+	})
+}
+
 func addHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		writeError(w, http.StatusBadRequest, "use post method")
+		return
+	}
 	var req CreateTaskRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
