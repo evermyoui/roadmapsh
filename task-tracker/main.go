@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -60,6 +61,12 @@ func addHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateHandler(w http.ResponseWriter, r *http.Request) {
+	id, err := parseID(r)
+
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "invalid id")
+		return
+	}
 	var req UpdateTaskRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -73,7 +80,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for i := range tasks {
-		if tasks[i].ID == req.ID {
+		if tasks[i].ID == id {
 			if req.Description != nil {
 				tasks[i].Description = *req.Description
 			}
@@ -96,7 +103,6 @@ type CreateTaskRequest struct {
 }
 
 type UpdateTaskRequest struct {
-	ID          int       `json:"id"`
 	Description *string   `json:"description"`
 	Status      *string   `json:"status"`
 	Updated_At  time.Time `json:"updated_at"`
@@ -119,4 +125,8 @@ func writeError(w http.ResponseWriter, status int, message string) {
 		Success: false,
 		Error:   message,
 	})
+}
+func parseID(r *http.Request) (int, error) {
+	idStr := r.URL.Path[len("/tasks/"):]
+	return strconv.Atoi(idStr)
 }
