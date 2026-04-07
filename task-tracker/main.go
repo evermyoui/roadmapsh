@@ -13,9 +13,10 @@ var tasks []Task
 
 func main() {
 
-	http.HandleFunc("/tasks/add", addHandler)     // post
-	http.HandleFunc("/tasks/{id}", updateHandler) // put
-	http.HandleFunc("/tasks", listHandler)        // get
+	http.HandleFunc("/tasks/add", addHandler)            // post
+	http.HandleFunc("/tasks/update/{id}", updateHandler) // put
+	http.HandleFunc("/tasks", listHandler)               // get
+	http.HandleFunc("/tasks/delete/{id}", deleteHandler) // delete
 
 	port := ":8080"
 	log.Printf("Starting Server localhost %s\n", port)
@@ -107,6 +108,25 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			writeJSON(w, http.StatusOK, APIResponse{
 				Success: true,
 				Data:    tasks[i],
+			})
+			return
+		}
+	}
+	writeError(w, http.StatusNotFound, "task not found")
+}
+
+func deleteHandler(w http.ResponseWriter, r *http.Request) {
+	id, err := parseID(r)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "invalid id")
+		return
+	}
+	for i := range tasks {
+		if tasks[i].ID == id {
+			tasks = append(tasks[:i], tasks[i+1:]...)
+			writeJSON(w, http.StatusOK, APIResponse{
+				Success: true,
+				Data:    "deleted successfully",
 			})
 			return
 		}
