@@ -12,7 +12,8 @@ var tasks []Task
 
 func main() {
 
-	http.HandleFunc("/tasks", addHandler) // post
+	http.HandleFunc("/tasks", addHandler)         // post
+	http.HandleFunc("/tasks/{id}", updateHandler) // put
 
 	port := ":8080"
 	log.Printf("Starting Server localhost %s\n", port)
@@ -66,11 +67,28 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if req.Description != nil || req.Status != nil {
-		writeError(w, http.StatusBadRequest, "write something in description")
+	if req.Description == nil && req.Status == nil {
+		writeError(w, http.StatusBadRequest, "nothing to update")
 		return
 	}
 
+	for i := range tasks {
+		if tasks[i].ID == req.ID {
+			if req.Description != nil {
+				tasks[i].Description = *req.Description
+			}
+			if req.Status != nil {
+				tasks[i].Status = *req.Status
+			}
+			tasks[i].Updated_At = time.Now()
+			writeJSON(w, http.StatusOK, APIResponse{
+				Success: true,
+				Data:    tasks[i],
+			})
+			return
+		}
+	}
+	writeError(w, http.StatusNotFound, "task not found")
 }
 
 type CreateTaskRequest struct {
@@ -78,10 +96,10 @@ type CreateTaskRequest struct {
 }
 
 type UpdateTaskRequest struct {
-	Description *string    `json:"description"`
-	Status      *string    `json:"status"`
-	Created_At  *time.Time `json:"created_at"`
-	Updated_At  time.Time  `json:"updated_at"`
+	ID          int       `json:"id"`
+	Description *string   `json:"description"`
+	Status      *string   `json:"status"`
+	Updated_At  time.Time `json:"updated_at"`
 }
 
 type APIResponse struct {
