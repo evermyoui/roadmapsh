@@ -78,7 +78,7 @@ func addHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateHandler(w http.ResponseWriter, r *http.Request) {
-	id, err := parseID(r)
+	id, err := parseID(r, "/tasks/update/")
 
 	if err != nil {
 		writeError(w, http.StatusBadRequest, "invalid id")
@@ -116,7 +116,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteHandler(w http.ResponseWriter, r *http.Request) {
-	id, err := parseID(r)
+	id, err := parseID(r, "/tasks/delete/")
 	if err != nil {
 		writeError(w, http.StatusBadRequest, "invalid id")
 		return
@@ -162,7 +162,7 @@ func writeError(w http.ResponseWriter, status int, message string) {
 		Error:   message,
 	})
 }
-func parseID(r *http.Request) (int, error) {
-	idStr := r.URL.Path[len("/tasks/"):]
+func parseID(r *http.Request, prefix string) (int, error) {
+	idStr := r.URL.Path[len(prefix):]
 	return strconv.Atoi(idStr)
 }
