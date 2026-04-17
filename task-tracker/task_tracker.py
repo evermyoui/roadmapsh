@@ -34,3 +34,13 @@ def list_tasks():
 
     for i in range(len(tasks)):
         print(i, tasks[i])
+
+def delete_task(id):
+    tasks = load_tasks()
+
+    new_tasks = [task for task in tasks if task["id"] != id]
+    if len(new_tasks) == len(tasks):
+        print("Task not found")
+        return
+    save_tasks(new_tasks)
+    print("Deleted Succesfully")
