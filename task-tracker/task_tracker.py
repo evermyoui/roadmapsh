@@ -28,3 +28,9 @@ def add_task(desc):
     save_tasks(tasks)
 
     print("Add task successfully")
+
+def list_tasks():
+    tasks = load_tasks()
+
+    for i in range(len(tasks)):
+        print(i, tasks[i])
