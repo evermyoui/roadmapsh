@@ -15,3 +15,16 @@ def load_tasks():
 def save_tasks(tasks):
     with open(FILENAME, "w") as file:
         json.dump(tasks, file, indent=4)
+
+def add_task(desc):
+    tasks = load_tasks()
+    task = {
+        "id": len(tasks) +1,
+        "description": desc,
+        "status": "todo"
+    }
+    tasks.append(task)
+
+    save_tasks(tasks)
+
+    print("Add task successfully")
