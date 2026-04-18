@@ -1,0 +1,23 @@
+# TASK TRACKER CLI
+
+## Features
+- add new task
+- list tasks
+- filter tasks with different status
+- update task
+- delete task
+- created and updated timestamps
+- store to JSON file
+
+## Usage
+- python3 task_tracker.py <command> [args]
+    ### Add
+    - python3 task_tracker.py add "description"
+    ### Update 
+    - python3 task_tracker.py update 1 "New description"
+    ### List All
+    - python3 task_tracker.py list
+    ### List Specific Status
+    - python3 task_tracker.py list [todo, mark-in-progress, mark-done] <id>
+    ### Delete
+    - python3 task_tracker.py delete <id>

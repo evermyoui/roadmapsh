@@ -1,5 +1,6 @@
 import os
 import json
+from datetime import datetime
 import sys
 
 FILENAME = "tasks.json"
@@ -22,7 +23,9 @@ def add_task(desc):
     task = {
         "id": len(tasks) +1,
         "description": desc,
-        "status": "todo"
+        "status": "todo",
+        "created_at": datetime.now().isoformat(),
+        "updated_at": datetime.now().isoformat()
     }
     tasks.append(task)
 
@@ -64,17 +67,19 @@ def update_task(id, desc):
         if tasks[i]["id"] == id :
             if desc != "":
                 tasks[i]["description"] = desc
+                tasks[i]["updated_at"] = datetime.now().isoformat()
             save_tasks(tasks)
             print("Successfully updated.")
             return
     print("Task not found")
 
 def change_status(status, id):
-    tasks = [task for task in tasks if task["status"] == status]
+    tasks = load_tasks()
 
     for task in tasks:
         if task["id"] == id:
             task["status"] = status
+            task["updated_at"] = datetime.now().isoformat()
             save_tasks(tasks)
             print("Successfully updated")
             return

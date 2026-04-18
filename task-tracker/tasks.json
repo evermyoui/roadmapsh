@@ -1,7 +1,9 @@
 [
     {
         "id": 1,
-        "description": "Buy groceries",
-        "status": "done"
+        "description": "Buy and cook dinner",
+        "status": "todo",
+        "created_at": "2026-04-18T18:14:40.461632",
+        "updated_at": "2026-04-18T18:15:31.139688"
     }
 ]
